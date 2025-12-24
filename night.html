@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merry Christmas 🎄</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    background: #000;
+    color: white;
+    overflow-x: hidden;
+}
+/* Navigation Tabs */
+nav {
+    width: 100%;
+    background: rgba(0,0,0,0.6);
+    padding: 15px 0;
+    position: fixed;
+    top: 0;
+    z-index: 999;
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+}
+nav a {
+    color: gold;
+    font-size: 1.1rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s;
+}
+nav a:hover {
+    color: white;
+    text-shadow: 0 0 10px gold;
+}
+/* Fullscreen Santa Video */
+.video-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+.video-container video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    z-index: -1;
+}
+.video-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.35);
+}
+.main-title {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    text-align: center;
+    font-size: 3rem;
+    font-weight: 700;
+    text-shadow: 0 0 25px gold;
+    transform: translateY(-50%);
+}
+/* Snow */
+.snow span {
+    position: absolute;
+    top: -10px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+    animation: fall linear infinite;
+    opacity: 0.8;
+}
+@keyframes fall { to { transform: translateY(100vh); } }
+/* Sections */
+section {
+    padding: 100px 20px;
+    text-align: center;
+    display: none;
+}
+/* Tree Glow */
+.tree {
+    width: 230px;
+    filter: drop-shadow(0 0 20px gold);
+    animation: glow 2s infinite alternate;
+}
+@keyframes glow {
+    from { filter: drop-shadow(0 0 10px gold); }
+    to { filter: drop-shadow(0 0 25px yellow); }
+}
+/* Fireworks */
+.firework {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background: gold;
+    border-radius: 50%;
+    animation: explode 800ms ease-out forwards;
+    pointer-events: none;
+}
+@keyframes explode {
+    from { transform: scale(1); opacity: 1; }
+    to { transform: scale(10); opacity: 0; }
+}
+/* Wishes input */
+.wish-box {
+    width: 80%;
+    max-width: 350px;
+    padding: 12px;
+    border-radius: 25px;
+    border: none;
+    outline: none;
+    text-align: center;
+    font-size: 1.1rem;
+}
+.wish-btn {
+    margin-top: 10px;
+    padding: 12px 25px;
+    border-radius: 25px;
+    background: gold;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+}
+/* Gift animation */
+.gift {
+    width: 100px;
+    cursor: pointer;
+    transition: transform 0.5s;
+}
+.gift:hover { transform: scale(1.2) rotate(-10deg); }
+/* Gallery grid */
+.gallery img {
+    width: 260px;
+    height: 180px;
+    object-fit: cover;
+    margin: 10px;
+    border-radius: 15px;
+    transition: 0.3s;
+}
+.gallery img:hover { transform: scale(1.08); }
+</style>
+</head>
+
+<body onclick="makeFirework(event)">
+
+<!-- Navigation Tabs -->
+<nav>
+    <a onclick="showPage('home')">Home</a>
+    <a onclick="showPage('wishes')">Wishes</a>
+    <a onclick="showPage('gallery')">Gallery</a>
+    <a onclick="showPage('history')">History</a>
+    <a onclick="showPage('quotes')">Quotes</a>
+</nav>
+
+<!-- Background Music -->
+<audio autoplay loop>
+    <source src="C:\Users\HP\OneDrive\ドキュメント\merry\we-wish-you-a-merry-christmas-442768.mp3">
+</audio>
+
+<!-- Home Page -->
+<div class="video-container" id="home">
+    <video autoplay loop muted playsinline>
+        <source src="C:\Users\HP\OneDrive\ドキュメント\merry\319696_small.mp4">
+    </video>
+    <div class="video-overlay"></div>
+    <h1 class="main-title">🎅 Happy Merry Christmas 🎄</h1>
+    <div class="snow" id="snow"></div>
+</div>
+
+<!-- Wishes Page -->
+<section id="wishes">
+    <h1>🎄 Christmas Wishes</h1>
+
+    <div class="wishes-container">
+        <!-- Name Input -->
+        <input type="text" id="userName" placeholder="Enter your name" style="padding:10px 15px; border-radius:10px; margin-bottom:20px; font-size:1rem; width:250px;" />
+
+        <!-- Wish Display -->
+        <p id="wishDisplay" style="font-size:1.5rem; margin:20px auto; max-width:700px; text-align:center; line-height:1.6;"></p>
+
+        <!-- Next Wish Button -->
+        <button class="wish-btn" onclick="nextWish()">Next Wish</button>
+
+        <!-- Gift Container -->
+        <div id="giftContainer"></div>
+    </div>
+</section>
+
+<script>
+    const wishes = [
+        "Wishing you a Merry Christmas filled with love, joy, and laughter, {name}! 🎁",
+        "May your Christmas sparkle with moments of love and goodwill, {name}! ✨",
+        "ख्रिसमसच्या शुभेच्छा {name}! आनंद आणि प्रेम तुमच्या जीवनात नांदोत. 🎄",
+        "क्रिसमस मुबारक {name}! घरात सुख, प्रेम आणि आनंद असो. 🕯️",
+        "This Christmas, may your heart be light and your holidays be bright, {name}! 🎉",
+        "May your festive season be full of fun and your New Year full of promise, {name}! 🌟",
+        "शुभ नाताळ {name}! प्रेम आणि गोड आठवणींनी भरलेला वर्ष येवो. ❤️"
+    ];
+
+    let index = 0;
+
+    function showWish() {
+        const name = document.getElementById('userName').value || "Friend";
+        const wishText = wishes[index].replace("{name}", name);
+        document.getElementById('wishDisplay').innerText = wishText;
+        animateGift();
+    }
+
+    function nextWish() {
+        index = (index + 1) % wishes.length;
+        showWish();
+    }
+
+    function animateGift() {
+        const giftContainer = document.getElementById('giftContainer');
+        giftContainer.innerHTML = "";
+
+        const gift = document.createElement('div');
+        gift.classList.add('gift');
+        giftContainer.appendChild(gift);
+
+        setTimeout(() => gift.remove(), 3000);
+    }
+
+    setInterval(() => {
+        nextWish();
+    }, 8000);
+
+    showWish();
+</script>
+
+<style>
+    .wishes-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+
+    .wish-btn {
+        margin-top: 20px;
+        padding: 10px 25px;
+        border-radius: 25px;
+        background: #ff6f61;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s;
+        color: white;
+    }
+
+    .wish-btn:hover {
+        background: #ff3b2e;
+        transform: scale(1.05);
+    }
+
+    #giftContainer {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 0;
+        pointer-events: none;
+    }
+
+    /* Gift animation */
+    .gift {
+        width: 30px;
+        height: 30px;
+        background: linear-gradient(45deg, red, green);
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 5px;
+        animation: popGift 2s ease-out forwards;
+    }
+
+    @keyframes popGift {
+        0% { transform: translateX(-50%) translateY(0) scale(0); opacity: 0; }
+        50% { transform: translateX(-50%) translateY(-50px) scale(1.2); opacity: 1; }
+        100% { transform: translateX(-50%) translateY(-100px) scale(1); opacity: 0; }
+    }
+</style>
+
+
+<!-- Gallery Page -->
+<section id="gallery">
+    <h1>📸 Christmas Gallery</h1>
+    <div class="gallery">
+        <img src="c1.jpg">
+        <img src="c2.jpg">
+        <img src="c3.jpg">
+        <img src="c4.jpg">
+    </div>
+</section>
+
+<!-- History Page -->
+<section id="history">
+    <h1>📜 History of Christmas</h1>
+    <p>
+        Christmas is celebrated on 25th December to commemorate the birth of Jesus Christ.
+        It originated in Western Christianity and now is celebrated worldwide with cultural adaptations.
+    </p>
+    <p>
+        Traditions include decorating Christmas trees, exchanging gifts, singing carols, and Santa Claus delivering gifts.
+    </p>
+    <p>
+        Christmas is an annual festival commemorating the birth of Jesus Christ, observed primarily on December 25[a] as a religious and cultural celebration among billions of people around the world. A liturgical feast central to Christianity, Christmas preparation begins on the First Sunday of Advent and it is followed by Christmastide, which historically in the West lasts twelve days and culminates on Twelfth Night. Christmas Day is a public holiday in many countries, is observed religiously by a majority of Christians, as well as celebrated culturally by many non-Christians, and forms an integral part of the annual holiday season.
+    </p>
+    <p>
+        नाताळ (Christmas) म्हणजे येशू ख्रिस्ताचा जन्मदिवस, जो २५ डिसेंबरला जगभर साजरा होतो, ज्यात देवदूत गॅब्रिएलने मरियेला (Mary) बाळाच्या जन्माची बातमी देणे, जोसेफ (Joseph) सोबत नाझरेथला प्रवास, आणि बेथलेहेममध्ये (Bethlehem) जन्म या घटनांचा समावेश आहे; या सणामध्ये ख्रिसमस ट्री, सांताक्लॉज (Santa Claus), भेटवस्तू, प्रार्थना आणि आनंद साजरा केला जातो, जो माणुसकी, आशा व नव्या सुरुवातीचे प्रतीक आहे. 
+    </p>
+    <p>
+        ख्रिसमसचे महत्त्व (Significance of Christmas)<br>
+धार्मिक: हा दिवस येशू ख्रिस्ताच्या जन्माचा आनंद आणि त्यांच्या शिकवणींचे स्मरण म्हणून साजरा होतो.<br>
+सांस्कृतिक: येशूच्या जन्माचा देखावा (Nativity Scene), ख्रिसमस ट्री (Christmas Tree), सांताक्लॉज, भेटवस्तू देणे, प्रार्थना करणे, विशेष जेवण आणि कुटुंबासोबत वेळ घालवणे अशा परंपरा जगभरात पाळल्या जातात.<br>
+प्रतीक: ख्रिसमस माणुसकी, आशा, प्रेम आणि नवीन सुरुवातीचे प्रतीक मानला जातो. <br>
+    </p>
+</section>
+
+<!-- Quotes Page -->
+<section id="quotes">
+    <h1>🎄 Christmas Quotes</h1>
+    <div class="quotes-container">
+        <p id="quoteDisplay" style="font-size:1.5rem; margin:20px auto; max-width:700px; text-align:center; line-height:1.6;"></p>
+        <button class="wish-btn" onclick="nextQuote()">Next Quote</button>
+    </div>
+</section>
+
+<script>
+    const quotes = [
+        // English
+        "Christmas is not as much about opening our presents as opening our hearts.",
+        "The best way to spread Christmas cheer is singing loud for all to hear.",
+        "Christmas waves a magic wand over this world, and behold, everything is softer and more beautiful. ",
+        "Gifts of time and love are surely the basic ingredients of a truly merry Christmas. ",
+        "Christmas is a season for kindling the fire of hospitality in the hall, the genial flame of charity in the heart. ",
+        "Blessed is the season which engages the whole world in a conspiracy of love. ",
+        "Christmas is the day that holds all time together. ",
+
+        // Marathi
+        "शुभ नाताळ! आनंद, प्रेम आणि आरोग्य तुमच्या आयुष्यात भरभराटीचे असो.",
+        "ख्रिसमसच्या आनंदाने तुमचे जीवन उजळून जावो.",
+        "ख्रिसमस म्हणजे प्रेम, आनंद आणि गोड आठवणींचा उत्सव.",
+        "ख्रिसमसच्या हार्दिक शुभेच्छा! देव तुमच्या घरात आनंद आणो.",
+        "प्रेम आणि आनंदाच्या प्रकाशात हा ख्रिसमस तुमच्यासाठी खास असो.",
+
+        // Hindi
+        "क्रिसमस मुबारक! खुशियाँ और प्यार हमेशा आपके साथ रहें।",
+        "क्रिसमस का समय है प्रेम बांटने का, हंसी फैलाने का और खुशियाँ पाने का।",
+        "इस क्रिसमस, आपके घर में सुख, शांति और खुशियाँ बनी रहें।",
+        "क्रिसमस की शुभकामनाएँ! ईश्वर आपके जीवन को उज्जवल करे।",
+        "खुशियों भरा क्रिसमस! प्यार और उमंग से भरी यह रात आपके लिए खास हो।"
+    ];
+
+    let quoteIndex = 0;
+
+    function showQuote() {
+        document.getElementById('quoteDisplay').innerText = quotes[quoteIndex];
+    }
+
+    function nextQuote() {
+        quoteIndex = (quoteIndex + 1) % quotes.length;
+        showQuote();
+    }
+
+    // Auto rotate every 8 seconds
+    setInterval(() => {
+        nextQuote();
+    }, 8000);
+
+    // Initialize first quote
+    showQuote();
+</script>
+
+<style>
+    .quotes-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .wish-btn {
+        margin-top: 20px;
+        padding: 10px 25px;
+        border-radius: 25px;
+        background: gold;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .wish-btn:hover {
+        background: orange;
+        transform: scale(1.05);
+    }
+</style>
+
+
+<script>
+// Tab Switching
+function showPage(id) {
+    document.querySelectorAll('section, .video-container').forEach(sec => sec.style.display = 'none');
+    document.getElementById(id).style.display = 'block';
+}
+
+// Snow Animation
+function createSnow(num=50){
+    const snowContainer = document.getElementById('snow');
+    for(let i=0;i<num;i++){
+        const span = document.createElement('span');
+        span.style.left = Math.random()*100 + 'vw';
+        span.style.animationDuration = 2+Math.random()*3+'s';
+        span.style.width = span.style.height = 5+Math.random()*5+'px';
+        snowContainer.appendChild(span);
+    }
+}
+createSnow();
+
+// Fireworks
+function makeFirework(e){
+    const fw = document.createElement('div');
+    fw.classList.add('firework');
+    fw.style.left = e.clientX+'px';
+    fw.style.top = e.clientY+'px';
+    document.body.appendChild(fw);
+    setTimeout(()=>fw.remove(),800);
+}
+ 
+</script>
+
+</body>
+</html>
